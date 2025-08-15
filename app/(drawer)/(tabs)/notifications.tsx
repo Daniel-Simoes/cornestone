@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
 
 export default function Notifications() {
  
   return (
     <View style={styles.container}>
-      <Text style={styles.texto}>Notifications</Text>
+     
     </View>
   );
 }

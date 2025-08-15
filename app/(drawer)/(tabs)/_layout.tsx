@@ -4,8 +4,11 @@ import { useNavigation } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import React, { useState } from "react";
 import {
+  Dimensions,
+  Image,
   Modal,
   TouchableOpacity as RNTouchableOpacity,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -22,6 +25,7 @@ type TabItem = {
 export default function TabLayout() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [cameraModalVisible, setCameraModalVisible] = useState(false);
 
   const tabs: TabItem[] = [
     { name: "index", icon: "home-outline" },
@@ -29,20 +33,37 @@ export default function TabLayout() {
     { name: "notifications", icon: "notifications-outline" },
   ];
 
+  // StatusBar light quando qualquer overlay estiver aberto
+  const isOverlayActive = modalVisible || cameraModalVisible;
+
   return (
     <>
+      <StatusBar
+        barStyle={isOverlayActive ? "light-content" : "dark-content"}
+        backgroundColor="transparent"
+        translucent
+      />
+
       <Tabs
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerTitle: "",
           tabBarShowLabel: false,
           tabBarStyle: {
             position: "absolute",
             height: 60,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
           },
-          headerRight: () => <Avatar onPress={() => setModalVisible(true)} />,
-        }}
+          headerRight: () =>
+            route.name === "notifications" ? (
+              <Ionicons
+                name="information-circle-outline"
+                size={26}
+                color="#007bff"
+                style={{ marginRight: 16 }}
+              />
+            ) : (
+              <Avatar onPress={() => setModalVisible(true)} />
+            ),
+        })}
       >
         {tabs.map((tab) => (
           <Tabs.Screen
@@ -50,7 +71,6 @@ export default function TabLayout() {
             name={tab.name}
             options={{
               headerTitle: tab.name === "notifications" ? "Notifications" : "",
-              headerTitleStyle: {}, // usa cor padrão do header
               headerLeft:
                 tab.name !== "notifications"
                   ? () => (
@@ -67,8 +87,9 @@ export default function TabLayout() {
                   return (
                     <RNTouchableOpacity
                       activeOpacity={0.8}
+                      onPress={() => setCameraModalVisible(true)}
                       style={{
-                        top: -25,
+                        top: -20,
                         backgroundColor: "#007bff",
                         width: 60,
                         height: 60,
@@ -99,7 +120,7 @@ export default function TabLayout() {
         ))}
       </Tabs>
 
-      {/* Modal */}
+      {/* Modal do Avatar */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -112,6 +133,45 @@ export default function TabLayout() {
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ color: "#fff" }}>Scanei</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal da Câmera */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={cameraModalVisible}
+        onRequestClose={() => setCameraModalVisible(false)}
+      >
+        <View style={styles.modalOverlayCamera}>
+          {/* Botão X acima do modalContent */}
+          <TouchableOpacity
+            style={styles.closeIconOverlay}
+            onPress={() => setCameraModalVisible(false)}
+          >
+            <Ionicons name="close" size={28} color="#fff" />
+          </TouchableOpacity>
+
+          <View style={styles.modalContent}>
+            <Image
+              source={require("../../../assets/fuseboard.png")}
+              style={{
+                width: Dimensions.get("window").width * 0.5,
+                height: Dimensions.get("window").width * 0.5,
+                resizeMode: "contain",
+                marginBottom: 20,
+              }}
+            />
+            <Text style={{ textAlign: "center" }}>
+              Vá até o Quadro geral e escaneie o QR code
+            </Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setCameraModalVisible(false)}
             >
               <Text style={{ color: "#fff" }}>Fechar</Text>
             </TouchableOpacity>
@@ -128,6 +188,18 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalOverlayCamera: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeIconOverlay: {
+    position: "absolute",
+    top: "40%", // ajusta conforme necessidade
+    right: 20,
+    zIndex: 1,
   },
   modalContent: {
     width: 250,

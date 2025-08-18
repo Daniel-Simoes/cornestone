@@ -14,16 +14,16 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([
     {
       id: "1",
-      title: "Nova Mensagem",
+      title: "Novo Arquivo Adicionado",
       description:
-        "Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat.",
-      icon: "chatbubble-outline",
+        "Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat.",
+      icon: "cloud-upload-outline",
     },
     {
       id: "2",
       title: "Atualização do App",
       description: "Uma nova versão do app está disponível.",
-      icon: "cloud-download-outline",
+      icon: "chatbox-outline",
     },
     {
       id: "3",
@@ -54,26 +54,13 @@ export default function Notifications() {
     }
   };
 
-  const renderRightActions = (
-    progress: Animated.AnimatedInterpolation,
-    dragX: Animated.AnimatedInterpolation
-  ) => {
-    const scale = dragX.interpolate({
-      inputRange: [-100, 0],
-      outputRange: [1, 0],
-      extrapolate: "clamp",
-    });
+  const renderRightActions = () => (
+    <RectButton style={styles.rightAction}>
+      <Ionicons name="trash-outline" size={28} color="#fff" />
+    </RectButton>
+  );
 
-    return (
-      <RectButton style={styles.rightAction}>
-        <Animated.View style={{ transform: [{ scale }] }}>
-          <Ionicons name="trash-outline" size={28} color="#fff" />
-        </Animated.View>
-      </RectButton>
-    );
-  };
-
-  const renderItem = ({ item }: { item: typeof notifications[0] }) => {
+  const renderItem = ({ item, index }: { item: typeof notifications[0]; index: number }) => {
     const isExpanded = expandedId === item.id;
     const opacity = new Animated.Value(1);
 
@@ -86,54 +73,47 @@ export default function Notifications() {
         renderRightActions={renderRightActions}
         onSwipeableOpen={() => handleDelete(item.id)}
       >
-        <Animated.View
-          style={[
-            styles.notificationItem,
-            { opacity, paddingBottom: isExpanded ? 16 : 0 },
-          ]}
-        >
-          {/* Ícone + linha vertical */}
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name={item.icon as any}
-              size={28}
-              color="#007bff"
-            />
-            <View style={styles.verticalLine} />
-          </View>
-
-          {/* Texto e botões */}
+        <Animated.View style={[styles.card, { opacity }]}>
           <TouchableOpacity
-            style={styles.textContainer}
+            style={styles.item}
             onPress={() => handlePress(item.id)}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
-            <Text style={styles.notificationTitle}>{item.title}</Text>
-            <Text
-              style={styles.notificationDescription}
-              numberOfLines={isExpanded ? undefined : 1}
-              ellipsizeMode="tail"
-            >
-              {item.description}
-            </Text>
+            <View style={styles.iconWrapper}>
+              <Ionicons name={item.icon as any} size={20} color="#007bff" />
+            </View>
 
-            {isExpanded && (
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={[styles.button, { backgroundColor: "red" }]}
-                  onPress={() => handleDelete(item.id)}
-                >
-                  <Text style={styles.buttonText}>Apagar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, { backgroundColor: "#007bff" }]}
-                  onPress={() => setExpandedId(null)}
-                >
-                  <Text style={styles.buttonText}>Manter</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            <View style={styles.textWrapper}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text
+                style={styles.description}
+                numberOfLines={isExpanded ? undefined : 1}
+                ellipsizeMode="tail"
+              >
+                {item.description}
+              </Text>
+
+              {isExpanded && (
+                <View style={styles.buttonRow}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: "red" }]}
+                    onPress={() => handleDelete(item.id)}
+                  >
+                    <Text style={styles.buttonText}>Apagar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: "#007bff" }]}
+                    onPress={() => setExpandedId(null)}
+                  >
+                    <Text style={styles.buttonText}>Manter</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </TouchableOpacity>
+
+          {/* Linha separadora entre itens */}
+          {index !== notifications.length - 1 && <View style={styles.separator} />}
         </Animated.View>
       </Swipeable>
     );
@@ -145,7 +125,7 @@ export default function Notifications() {
         data={notifications}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ padding: 8 }}
+        contentContainerStyle={styles.listContainer}
       />
     </View>
   );
@@ -154,55 +134,56 @@ export default function Notifications() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#f5f5f5",
+    top:10
   },
-  notificationItem: {
-    flexDirection: "row",
+  header: {
+    fontSize: 18,
+    fontWeight: "600",
+    margin: 16,
+  },
+  listContainer: {
+    marginHorizontal: 16,
     backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 6,
-    marginBottom: 6,
-    alignItems: "center", // centraliza ícone verticalmente
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0.5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 1,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
   },
-  iconContainer: {
-    alignItems: "center",
-    marginRight: 8,
-    position: "relative",
+  card: {
+    backgroundColor: "#fff",
   },
-  verticalLine: {
-    position: "absolute",
-    left: 14, // ajusta para ficar próximo do ícone
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: "#ccc",
+  item: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
-  textContainer: {
+  iconWrapper: {
+    top:-2,
+    marginRight: 12,
+    marginTop: 2,
+  },
+  textWrapper: {
     flex: 1,
-    marginLeft: 8,
   },
-  notificationTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+  title: {
+    fontSize: 15,
+    fontWeight: "600",
     marginBottom: 4,
   },
-  notificationDescription: {
+  description: {
     fontSize: 14,
     color: "#555",
   },
-  buttonContainer: {
+  buttonRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop: 12,
+    marginTop: 10,
   },
-  button: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  actionButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderRadius: 6,
     marginLeft: 8,
   },
@@ -210,12 +191,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  separator: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginLeft: 52, // deixa alinhado depois do ícone
+  },
   rightAction: {
     backgroundColor: "red",
     justifyContent: "center",
     alignItems: "center",
     width: 80,
-    marginBottom: 6,
+    marginVertical: 4,
     borderRadius: 10,
   },
 });

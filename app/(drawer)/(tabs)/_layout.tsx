@@ -1,13 +1,13 @@
 import Avatar from "@/components/avatar";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
   Image,
   Modal,
-  TouchableOpacity as RNTouchableOpacity,
+  SectionList,
   StatusBar,
   StyleSheet,
   Text,
@@ -23,9 +23,12 @@ type TabItem = {
 };
 
 export default function TabLayout() {
+  const router = useRouter();
   const navigation = useNavigation();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
 
   const tabs: TabItem[] = [
     { name: "index", icon: "home-outline" },
@@ -33,8 +36,30 @@ export default function TabLayout() {
     { name: "notifications", icon: "notifications-outline" },
   ];
 
-  // StatusBar light quando qualquer overlay estiver aberto
-  const isOverlayActive = modalVisible || cameraModalVisible;
+  const isOverlayActive = modalVisible || cameraModalVisible || profileModalVisible;
+
+  const sections = [
+    {
+      title: "",
+      data: [{ label: "Activity Status", value: "Active" }],
+    },
+    {
+      title: "PERSONALIZE",
+      data: [
+        { label: "Personal Details" },
+        { label: "Heart Rate Zones" },
+        { label: "Settings" },
+      ],
+    },
+    {
+      title: "NEED HELP?",
+      data: [
+        { label: "Tips and Tricks" },
+        { label: "Frequently Asked Questions" },
+        { label: "Contact Us" },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -61,7 +86,7 @@ export default function TabLayout() {
                 style={{ marginRight: 16 }}
               />
             ) : (
-              <Avatar onPress={() => setModalVisible(true)} />
+              <Avatar onPress={() => setProfileModalVisible(true)} />
             ),
         })}
       >
@@ -74,37 +99,24 @@ export default function TabLayout() {
               headerLeft:
                 tab.name !== "notifications"
                   ? () => (
-                      <RNTouchableOpacity
+                      <TouchableOpacity
                         onPress={() => navigation.openDrawer()}
                         style={{ marginLeft: 16 }}
                       >
                         <Ionicons name="menu" size={24} color="#007bff" />
-                      </RNTouchableOpacity>
+                      </TouchableOpacity>
                     )
                   : undefined,
               tabBarIcon: ({ focused }) => {
                 if (tab.name === "camera") {
                   return (
-                    <RNTouchableOpacity
+                    <TouchableOpacity
                       activeOpacity={0.8}
                       onPress={() => setCameraModalVisible(true)}
-                      style={{
-                        top: -20,
-                        backgroundColor: "#007bff",
-                        width: 60,
-                        height: 60,
-                        borderRadius: 30,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 3,
-                        elevation: 5,
-                      }}
+                      style={styles.cameraButton}
                     >
                       <Ionicons name={tab.icon} size={28} color="#fff" />
-                    </RNTouchableOpacity>
+                    </TouchableOpacity>
                   );
                 }
                 return (
@@ -120,7 +132,58 @@ export default function TabLayout() {
         ))}
       </Tabs>
 
-      {/* Modal do Avatar */}
+      {/* Profile Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={profileModalVisible}
+        onRequestClose={() => setProfileModalVisible(false)}
+      >
+        <View style={styles.profileOverlay}>
+          <View style={styles.profileContainer}>
+            {/* Header */}
+            <View style={styles.profileHeader}>
+              <TouchableOpacity onPress={() => setProfileModalVisible(false)}>
+                <Text style={styles.closeText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Foto e Nome */}
+            <View style={styles.profileInfo}>
+              <Image
+                source={require("../../../assets/avatar.png")}
+                style={styles.avatar}
+              />
+              <Text style={styles.name}>Daniel S.</Text>
+            </View>
+
+            {/* Lista */}
+            <SectionList
+              sections={sections}
+              keyExtractor={(item, index) => item.label + index}
+              renderItem={({ item, index, section }) => {
+                const isLast = index === section.data.length - 1;
+                return (
+                  <TouchableOpacity
+                    style={[profileStyles.item, isLast && profileStyles.lastItem]}
+                  >
+                    <Text style={profileStyles.itemLabel}>{item.label}</Text>
+                    {item.value && <Text style={profileStyles.itemValue}>{item.value}</Text>}
+                    <Ionicons name="chevron-forward" size={18} color="#ccc" />
+                  </TouchableOpacity>
+                );
+              }}
+              renderSectionHeader={({ section: { title } }) =>
+                title ? <Text style={profileStyles.sectionHeader}>{title}</Text> : null
+              }
+              ItemSeparatorComponent={() => <View style={profileStyles.separator} />}
+              contentContainerStyle={{ paddingBottom: 40 }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal simples */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -148,7 +211,6 @@ export default function TabLayout() {
         onRequestClose={() => setCameraModalVisible(false)}
       >
         <View style={styles.modalOverlayCamera}>
-          {/* Botão X acima do modalContent */}
           <TouchableOpacity
             style={styles.closeIconOverlay}
             onPress={() => setCameraModalVisible(false)}
@@ -183,6 +245,56 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  profileOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "flex-end",
+  },
+  profileContainer: {
+    height: "95%",
+    backgroundColor: "#f5f5f5",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 40,
+    paddingHorizontal: 16,
+  },
+  profileHeader: {
+    alignItems: "flex-end",
+    paddingHorizontal: 20,
+  },
+  closeText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#007bff",
+  },
+  profileInfo: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  cameraButton: {
+    top: -20,
+    backgroundColor: "#007bff",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -197,7 +309,7 @@ const styles = StyleSheet.create({
   },
   closeIconOverlay: {
     position: "absolute",
-    top: "40%", // ajusta conforme necessidade
+    top: "40%",
     right: 20,
     zIndex: 1,
   },
@@ -214,5 +326,45 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
+  },
+});
+
+// Estilos do SectionList para parecer com SettingsList
+const profileStyles = StyleSheet.create({
+  sectionHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#666",
+  },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+    // borderWidth:1,
+    // borderColor:"ccc",
+    // borderRadius:8,
+  },
+  lastItem: {
+    borderBottomWidth: 0,
+  },
+  itemLabel: {
+    fontSize: 16,
+    color: "#111",
+  },
+  itemValue: {
+    fontSize: 14,
+    color: "green",
+    marginRight: 8,
+    fontWeight: "600",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginLeft: 16,
   },
 });

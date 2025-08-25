@@ -12,6 +12,7 @@ import {
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.7;
 const CARD_SPACING = 16;
+const ITEM_SIZE = CARD_WIDTH + CARD_SPACING;
 
 type Carousel = {
   id: string;
@@ -41,17 +42,24 @@ const originalData: Carousel[] = [
   },
 ];
 
-// duplicamos os dados pra simular looping infinito
+// duplicar dados
 const data = [...originalData, ...originalData];
 
 export default function Carousel() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
 
-  // detectar fim do scroll e resetar posição pro início (loop)
+  // Scroll para o segundo item (índice 1) após layout
+  const handleLayout = () => {
+    flatListRef.current?.scrollToOffset({
+      offset: ITEM_SIZE, // índice 1 * largura do item
+      animated: false,
+    });
+  };
+
   const handleMomentumScrollEnd = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const totalWidth = (CARD_WIDTH + CARD_SPACING) * originalData.length;
+    const totalWidth = ITEM_SIZE * originalData.length;
 
     if (contentOffsetX >= totalWidth) {
       flatListRef.current?.scrollToOffset({
@@ -69,19 +77,22 @@ export default function Carousel() {
         keyExtractor={(item, index) => item.id + index}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH + CARD_SPACING}
+        snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
+        onLayout={handleLayout} // 👈 scrolla pro segundo item aqui
         onMomentumScrollEnd={handleMomentumScrollEnd}
-        contentContainerStyle={{ paddingHorizontal: (width - CARD_WIDTH) / 2 }}
+        contentContainerStyle={{
+          paddingHorizontal: (width - CARD_WIDTH) / 2,
+        }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: false }
         )}
         renderItem={({ item, index }) => {
           const inputRange = [
-            (index - 1) * (CARD_WIDTH + CARD_SPACING),
-            index * (CARD_WIDTH + CARD_SPACING),
-            (index + 1) * (CARD_WIDTH + CARD_SPACING),
+            (index - 1) * ITEM_SIZE,
+            index * ITEM_SIZE,
+            (index + 1) * ITEM_SIZE,
           ];
           const scale = scrollX.interpolate({
             inputRange,
@@ -90,7 +101,15 @@ export default function Carousel() {
           });
 
           return (
-            <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+            <Animated.View
+              style={[
+                styles.card,
+                {
+                  transform: [{ scale }],
+                  marginRight: CARD_SPACING,
+                },
+              ]}
+            >
               <View style={styles.imageContainer}>
                 <Image source={item.image} style={styles.image} />
               </View>
@@ -108,9 +127,9 @@ export default function Carousel() {
       <View style={styles.pagination}>
         {originalData.map((_, i) => {
           const inputRange = [
-            (i - 1) * (CARD_WIDTH + CARD_SPACING),
-            i * (CARD_WIDTH + CARD_SPACING),
-            (i + 1) * (CARD_WIDTH + CARD_SPACING),
+            (i - 1) * ITEM_SIZE,
+            i * ITEM_SIZE,
+            (i + 1) * ITEM_SIZE,
           ];
           const dotScale = scrollX.interpolate({
             inputRange,
@@ -131,35 +150,31 @@ export default function Carousel() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop:10,
+    paddingTop: 10,
     backgroundColor: "#f5f5f5",
   },
   card: {
     width: CARD_WIDTH,
-    marginRight: CARD_SPACING,
     backgroundColor: "white",
     borderRadius: 12,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 1, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 5,
-    overflow: "hidden", // garante borda arredondada
   },
   imageContainer: {
     height: 200,
-    overflow: "hidden",
+    backgroundColor: "yellow",
   },
   image: {
     width: "100%",
     height: "100%",
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    resizeMode: "cover",
   },
   textContainer: {
     padding: 12,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
   },
   title: {
     fontSize: 16,

@@ -183,25 +183,8 @@ export default function TabLayout() {
         </View>
       </Modal>
 
-      {/* Modal simples */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text>Olá! Este é o modal do Avatar.</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={{ color: "#fff" }}>Scanei</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      
+        
 
       {/* Modal da Câmera */}
       <Modal

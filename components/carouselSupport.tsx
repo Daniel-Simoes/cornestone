@@ -58,27 +58,22 @@ export default function App() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
       <SettingsList
-        title="Account Settings"
+        title="Drawings"
         items={[
           {
             id: "1",
-            label: "Manage Your Amazon",
+            label: "General Services",
             onPress: () => Alert.alert("Family"),
           },
           {
             id: "2",
-            label: "Manage apps & services",
+            label: "Lighting & Protective Services",
             onPress: () => Alert.alert("Apps"),
           },
           {
             id: "3",
-            label: "Manage Prime membership",
+            label: "Distribution Schematics",
             onPress: () => Alert.alert("Prime"),
-          },
-          {
-            id: "4",
-            label: "Your purchase preferences",
-            onPress: () => Alert.alert("Preferences"),
           }
         ]}
       />

@@ -23,12 +23,10 @@ export default function DrawerLayout() {
       drawerContent={() => (
         <View style={styles.drawerContainer}>
           <View>
-            {/* Avatar */}
             <View style={styles.avatarContainer}>
               <Avatar />
             </View>
 
-            {/* Menu items */}
             <TouchableOpacity style={styles.drawerItem}>
               <Ionicons name="settings-outline" size={20} color="#fff" />
               <Text style={[styles.drawerItemText, { marginLeft: 10 }]}>Settings</Text>
@@ -39,10 +37,8 @@ export default function DrawerLayout() {
               <Text style={[styles.drawerItemText, { marginLeft: 10 }]}>Support</Text>
             </TouchableOpacity>
 
-            {/* Linha divisória */}
             <View style={styles.divider} />
 
-            {/* Cornerstone AR item */}
             <TouchableOpacity style={styles.drawerItem}>
               <Image
                 source={require("../../assets/logo.png")}
@@ -52,7 +48,6 @@ export default function DrawerLayout() {
             </TouchableOpacity>
           </View>
 
-          {/* Logout fixo na parte inferior */}
           <View style={styles.logoutContainer}>
             <TouchableOpacity
               style={[styles.drawerItem, styles.logoutButton]}
@@ -67,7 +62,7 @@ export default function DrawerLayout() {
         </View>
       )}
     >
-      <Drawer.Screen name="index" />
+      <Drawer.Screen name="(tabs)" />
     </Drawer>
   );
 }
@@ -83,12 +78,6 @@ const styles = StyleSheet.create({
   avatarContainer: {
     alignItems: "center",
     marginBottom: 40,
-  },
-  userName: {
-    marginTop: 10,
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
   },
   drawerItem: {
     flexDirection: "row",

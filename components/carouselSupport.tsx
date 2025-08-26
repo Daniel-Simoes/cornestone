@@ -1,7 +1,8 @@
+// CarouselSupport.tsx
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-  Alert,
   FlatList,
   SafeAreaView,
   StyleSheet,
@@ -10,73 +11,45 @@ import {
   View,
 } from "react-native";
 
-type SettingItem = {
-  id: string;
-  label: string;
-  onPress: () => void;
-};
-
 type Props = {
   title: string;
-  items: SettingItem[];
+  items: string[];
 };
 
-function SettingsList({ title, items }: Props) {
-  const renderItem = ({ item, index }: { item: SettingItem; index: number }) => {
+export default function CarouselSupport({ title, items }: Props) {
+  const router = useRouter();
+
+  const renderItem = ({ item, index }: { item: string; index: number }) => {
     const isLast = index === items.length - 1;
 
     return (
       <TouchableOpacity
         style={[styles.item, isLast && styles.lastItem]}
-        onPress={item.onPress}
+        onPress={() => router.push({ pathname: "/pdfScreen", params: { title: "Meu PDF" } })}
         activeOpacity={0.6}
       >
-        <Text style={styles.itemLabel}>{item.label}</Text>
+        <Text style={styles.itemLabel}>{item}</Text>
         <Ionicons name="chevron-forward" size={20} color="#555" />
       </TouchableOpacity>
     );
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+  if (!items || items.length === 0) return null; // Oculta se não houver subcategorias
 
-      <View style={styles.card}>
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      </View>
-    </View>
-  );
-}
-
-export default function App() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
-      <SettingsList
-        title="Drawings"
-        items={[
-          {
-            id: "1",
-            label: "General Services",
-            onPress: () => Alert.alert("Family"),
-          },
-          {
-            id: "2",
-            label: "Lighting & Protective Services",
-            onPress: () => Alert.alert("Apps"),
-          },
-          {
-            id: "3",
-            label: "Distribution Schematics",
-            onPress: () => Alert.alert("Prime"),
-          }
-        ]}
-      />
+      <View style={styles.container}>
+        <Text style={styles.title}>{title}</Text>
+        <View style={styles.card}>
+          <FlatList
+            data={items}
+            keyExtractor={(item, index) => `${item}-${index}`}
+            renderItem={renderItem}
+            scrollEnabled={false}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+          />
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -89,7 +62,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 12,
-  
   },
   card: {
     backgroundColor: "#fff",

@@ -1,3 +1,4 @@
+// Carousel.tsx
 import React, { useRef } from "react";
 import {
   Animated,
@@ -14,53 +15,38 @@ const CARD_WIDTH = width * 0.7;
 const CARD_SPACING = 16;
 const ITEM_SIZE = CARD_WIDTH + CARD_SPACING;
 
-type Carousel = {
+type CarouselItem = {
   id: string;
+  category: string;
   title: string;
-  subtitle: string;
   image: any;
 };
 
-const originalData: Carousel[] = [
-  {
-    id: "1",
-    title: "Docs Shared",
-    subtitle: "Electrical & Mechanical Schemes",
-    image: require("../assets/pdf.png"),
-  },
-  {
-    id: "2",
-    title: "Project Files",
-    subtitle: "Architecture & Planning",
-    image: require("../assets/electrical.png"),
-  },
-  {
-    id: "3",
-    title: "Reports",
-    subtitle: "Financial Overview",
-    image: require("../assets/certs.png"),
-  },
-];
+type CarouselProps = {
+  data: CarouselItem[];
+  onChangeActiveItem: (index: number) => void;
+};
 
-// duplicar dados
-const data = [...originalData, ...originalData];
-
-export default function Carousel() {
+export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
 
-  // Scroll para o segundo item (índice 1) após layout
+  const duplicatedData = [...data, ...data];
+
   const handleLayout = () => {
     flatListRef.current?.scrollToOffset({
-      offset: ITEM_SIZE, // índice 1 * largura do item
+      offset: ITEM_SIZE,
       animated: false,
     });
   };
 
   const handleMomentumScrollEnd = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const totalWidth = ITEM_SIZE * originalData.length;
+    const currentIndex = Math.round(contentOffsetX / ITEM_SIZE) % data.length;
 
+    onChangeActiveItem(currentIndex);
+
+    const totalWidth = ITEM_SIZE * data.length;
     if (contentOffsetX >= totalWidth) {
       flatListRef.current?.scrollToOffset({
         offset: 0,
@@ -73,13 +59,13 @@ export default function Carousel() {
     <View style={styles.container}>
       <Animated.FlatList
         ref={flatListRef}
-        data={data}
+        data={duplicatedData}
         keyExtractor={(item, index) => item.id + index}
         horizontal
         showsHorizontalScrollIndicator={false}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
-        onLayout={handleLayout} // 👈 scrolla pro segundo item aqui
+        onLayout={handleLayout}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         contentContainerStyle={{
           paddingHorizontal: (width - CARD_WIDTH) / 2,
@@ -113,19 +99,17 @@ export default function Carousel() {
               <View style={styles.imageContainer}>
                 <Image source={item.image} style={styles.image} />
               </View>
-
               <View style={styles.textContainer}>
+                <Text style={styles.category}>{item.category}</Text>
                 <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.subtitle}>{item.subtitle}</Text>
               </View>
             </Animated.View>
           );
         }}
       />
 
-      {/* Pagination */}
       <View style={styles.pagination}>
-        {originalData.map((_, i) => {
+        {data.map((_, i) => {
           const inputRange = [
             (i - 1) * ITEM_SIZE,
             i * ITEM_SIZE,
@@ -166,7 +150,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     height: 200,
-    backgroundColor: "yellow",
+    backgroundColor: "#f0f0f0",
   },
   image: {
     width: "100%",
@@ -176,12 +160,12 @@ const styles = StyleSheet.create({
   textContainer: {
     padding: 12,
   },
-  title: {
+  category: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
   },
-  subtitle: {
+  title: {
     fontSize: 14,
     color: "#333",
   },

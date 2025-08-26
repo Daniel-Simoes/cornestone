@@ -1,10 +1,11 @@
-// Carousel.tsx
 import React, { useRef } from "react";
 import {
   Animated,
   Dimensions,
   FlatList,
   Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   StyleSheet,
   Text,
   View,
@@ -29,8 +30,9 @@ type CarouselProps = {
 
 export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlatList<CarouselItem>>(null);
 
+  // Duplica os dados para criar efeito de looping
   const duplicatedData = [...data, ...data];
 
   const handleLayout = () => {
@@ -40,14 +42,13 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
     });
   };
 
-  const handleMomentumScrollEnd = (event: any) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const currentIndex = Math.round(contentOffsetX / ITEM_SIZE) % data.length;
+  const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / ITEM_SIZE) % data.length;
 
-    onChangeActiveItem(currentIndex);
+    onChangeActiveItem(index);
 
-    const totalWidth = ITEM_SIZE * data.length;
-    if (contentOffsetX >= totalWidth) {
+    if (offsetX >= ITEM_SIZE * data.length) {
       flatListRef.current?.scrollToOffset({
         offset: 0,
         animated: false,
@@ -55,12 +56,40 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
     }
   };
 
+  const renderItem = ({ item, index }: { item: CarouselItem; index: number }) => {
+    const inputRange = [
+      (index - 1) * ITEM_SIZE,
+      index * ITEM_SIZE,
+      (index + 1) * ITEM_SIZE,
+    ];
+
+    const scale = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.9, 1.05, 0.9],
+      extrapolate: "clamp",
+    });
+
+    return (
+      <Animated.View style={{ transform: [{ scale }], marginRight: CARD_SPACING }}>
+        <View style={styles.card}>
+          <View style={styles.imageContainer}>
+            <Image source={item.image} style={styles.image} />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.category}>{item.category}</Text>
+            <Text style={styles.title}>{item.title}</Text>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Animated.FlatList
         ref={flatListRef}
         data={duplicatedData}
-        keyExtractor={(item, index) => item.id + index}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         snapToInterval={ITEM_SIZE}
@@ -72,42 +101,12 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
         }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: true }
         )}
-        renderItem={({ item, index }) => {
-          const inputRange = [
-            (index - 1) * ITEM_SIZE,
-            index * ITEM_SIZE,
-            (index + 1) * ITEM_SIZE,
-          ];
-          const scale = scrollX.interpolate({
-            inputRange,
-            outputRange: [0.9, 1.05, 0.9],
-            extrapolate: "clamp",
-          });
-
-          return (
-            <Animated.View
-              style={[
-                styles.card,
-                {
-                  transform: [{ scale }],
-                  marginRight: CARD_SPACING,
-                },
-              ]}
-            >
-              <View style={styles.imageContainer}>
-                <Image source={item.image} style={styles.image} />
-              </View>
-              <View style={styles.textContainer}>
-                <Text style={styles.category}>{item.category}</Text>
-                <Text style={styles.title}>{item.title}</Text>
-              </View>
-            </Animated.View>
-          );
-        }}
+        renderItem={renderItem}
       />
 
+      {/* Paginação animada */}
       <View style={styles.pagination}>
         {data.map((_, i) => {
           const inputRange = [
@@ -115,11 +114,13 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
             i * ITEM_SIZE,
             (i + 1) * ITEM_SIZE,
           ];
+
           const dotScale = scrollX.interpolate({
             inputRange,
             outputRange: [0.8, 1.5, 0.8],
             extrapolate: "clamp",
           });
+
           return (
             <Animated.View
               key={i}

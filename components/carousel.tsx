@@ -32,29 +32,44 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList<CarouselItem>>(null);
 
-  // Duplica os dados para criar efeito de looping
-  const duplicatedData = [...data, ...data];
+  const dataLength = data.length;
+  // Triplicamos a lista pra criar loop infinito
+  const duplicatedData = [...data, ...data, ...data];
+  const initialScrollIndex = dataLength;
 
   const handleLayout = () => {
     flatListRef.current?.scrollToOffset({
-      offset: ITEM_SIZE,
+      offset: ITEM_SIZE * initialScrollIndex,
       animated: false,
     });
   };
 
   const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const index = Math.round(offsetX / ITEM_SIZE) % data.length;
+    let offsetX = event.nativeEvent.contentOffset.x;
+    let currentIndex = Math.round(offsetX / ITEM_SIZE);
 
-    onChangeActiveItem(index);
-
-    if (offsetX >= ITEM_SIZE * data.length) {
+    if (currentIndex < dataLength) {
+      currentIndex += dataLength;
       flatListRef.current?.scrollToOffset({
-        offset: 0,
+        offset: currentIndex * ITEM_SIZE,
+        animated: false,
+      });
+    } else if (currentIndex >= dataLength * 2) {
+      currentIndex -= dataLength;
+      flatListRef.current?.scrollToOffset({
+        offset: currentIndex * ITEM_SIZE,
         animated: false,
       });
     }
+
+    onChangeActiveItem(currentIndex % dataLength);
   };
+
+  // Aqui normalizamos scrollX pra refletir índice real do array original
+  const normalizedScrollX = Animated.modulo(
+    Animated.divide(scrollX, ITEM_SIZE),
+    dataLength
+  );
 
   const renderItem = ({ item, index }: { item: CarouselItem; index: number }) => {
     const inputRange = [
@@ -65,12 +80,17 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
 
     const scale = scrollX.interpolate({
       inputRange,
-      outputRange: [0.9, 1.05, 0.9],
+      outputRange: [0.9, 1, 0.9],
       extrapolate: "clamp",
     });
 
     return (
-      <Animated.View style={{ transform: [{ scale }], marginRight: CARD_SPACING }}>
+      <Animated.View
+        style={{
+          transform: [{ scale }],
+          marginRight: CARD_SPACING,
+        }}
+      >
         <View style={styles.card}>
           <View style={styles.imageContainer}>
             <Image source={item.image} style={styles.image} />
@@ -106,17 +126,11 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
         renderItem={renderItem}
       />
 
-      {/* Paginação animada */}
       <View style={styles.pagination}>
         {data.map((_, i) => {
-          const inputRange = [
-            (i - 1) * ITEM_SIZE,
-            i * ITEM_SIZE,
-            (i + 1) * ITEM_SIZE,
-          ];
-
-          const dotScale = scrollX.interpolate({
-            inputRange,
+          // Agora usamos normalizedScrollX pra paginação acompanhar o item certo
+          const dotScale = normalizedScrollX.interpolate({
+            inputRange: [i - 1, i, i + 1],
             outputRange: [0.8, 1.5, 0.8],
             extrapolate: "clamp",
           });

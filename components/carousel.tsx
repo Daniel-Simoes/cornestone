@@ -150,7 +150,6 @@ export default function Carousel({ data, onChangeActiveItem }: CarouselProps) {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 10,
-    backgroundColor: "#f5f5f5",
   },
   card: {
     width: CARD_WIDTH,
@@ -193,7 +192,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#007bff",
+    backgroundColor: "#2357C4",
     margin: 4,
   },
 });

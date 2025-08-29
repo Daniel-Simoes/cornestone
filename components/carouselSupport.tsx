@@ -11,39 +11,48 @@ import {
   View,
 } from "react-native";
 
+// Atualiza a tipagem
 type Props = {
   title: string;
-  items: string[];
+  items: { name: string; content: string }[];
 };
 
 export default function CarouselSupport({ title, items }: Props) {
   const router = useRouter();
 
-  const renderItem = ({ item, index }: { item: string; index: number }) => {
+  const renderItem = ({ item, index }: { item: { name: string; content: string }; index: number }) => {
     const isLast = index === items.length - 1;
 
     return (
       <TouchableOpacity
         style={[styles.item, isLast && styles.lastItem]}
-        onPress={() => router.push({ pathname: "/pdfScreen", params: { title: "Meu PDF" } })}
+        onPress={() =>
+          router.push({
+            pathname: "/pdfScreen",
+            params: {
+              title: item.name,    // ← Nome visível no PDF
+              content: item.content, // ← Conteúdo real do PDF
+            },
+          })
+        }
         activeOpacity={0.6}
       >
-        <Text style={styles.itemLabel}>{item}</Text>
+        <Text style={styles.itemLabel}>{item.name}</Text>
         <Ionicons name="chevron-forward" size={20} color="#555" />
       </TouchableOpacity>
     );
   };
 
-  if (!items || items.length === 0) return null; // Oculta se não houver subcategorias
+  if (!items || items.length === 0) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
+    <SafeAreaView style={{ flex: 1}}>
       <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
         <View style={styles.card}>
           <FlatList
             data={items}
-            keyExtractor={(item, index) => `${item}-${index}`}
+            keyExtractor={(item, index) => `${item.name}-${index}`}
             renderItem={renderItem}
             scrollEnabled={false}
             ItemSeparatorComponent={() => <View style={styles.separator} />}

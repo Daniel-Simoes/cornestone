@@ -1,5 +1,4 @@
 import Avatar from "@/components/avatar";
-import { Ionicons } from "@expo/vector-icons";
 import { Drawer } from "expo-router/drawer";
 import React from "react";
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -14,50 +13,47 @@ export default function DrawerLayout() {
       screenOptions={{
         headerShown: false,
         drawerStyle: {
-          backgroundColor: "#007bff",
-          width: 250,
+          backgroundColor: "#1565C0", // azul mais próximo do print
+          width: 275,
         },
-        drawerActiveTintColor: "#fff",
-        drawerInactiveTintColor: "#fff",
+        overlayColor: "transparent",
+        // drawerActiveTintColor: "#fff",
+        // drawerInactiveTintColor: "#fff",
       }}
       drawerContent={() => (
         <View style={styles.drawerContainer}>
+          {/* TOPO */}
           <View>
-            <View style={styles.avatarContainer}>
-              <Avatar />
+            <View style={styles.profileContainer}>
+              <Avatar size={70} />
+              <Text style={styles.userName}>Mark Philips</Text>
+              <Text style={styles.userEmail}>mark_philips@gmail.com</Text>
             </View>
 
+            {/* Itens de navegação */}
             <TouchableOpacity style={styles.drawerItem}>
-              <Ionicons name="settings-outline" size={20} color="#fff" />
-              <Text style={[styles.drawerItemText, { marginLeft: 10 }]}>Settings</Text>
+              <Text style={styles.drawerItemText}>Configurações</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.drawerItem}>
-              <Ionicons name="help-circle-outline" size={20} color="#fff" />
-              <Text style={[styles.drawerItemText, { marginLeft: 10 }]}>Support</Text>
+              <Text style={styles.drawerItemText}>Suporte</Text>
             </TouchableOpacity>
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.drawerItem}>
+            {/* Logo */}
+            <View style={styles.logoContainer}>
               <Image
                 source={require("../../assets/logo.png")}
                 style={styles.cornerstoneIcon}
               />
-              <Text style={[styles.drawerItemText, { marginLeft: 10 }]}>Cornerstone AR</Text>
-            </TouchableOpacity>
+              <Text style={styles.cornerstoneText}>cornerstone</Text>
+            </View>
           </View>
 
-          <View style={styles.logoutContainer}>
-            <TouchableOpacity
-              style={[styles.drawerItem, styles.logoutButton]}
-              onPress={handleLogout}
-            >
-              <Ionicons name="log-out-outline" size={20} color="#fff" />
-              <Text style={[styles.drawerItemText, { fontWeight: "bold", marginLeft: 10 }]}>
-                Logout
-              </Text>
-            </TouchableOpacity>
+          {/* Rodapé */}
+          <View style={styles.footer}>
+            <Text style={styles.version}>~ v 1.0.1</Text>
           </View>
         </View>
       )}
@@ -73,16 +69,25 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     justifyContent: "space-between",
-    backgroundColor: "#007bff",
+    backgroundColor: "#2357C4",
   },
-  avatarContainer: {
-    alignItems: "center",
+  profileContainer: {
+    alignItems: "flex-start",
     marginBottom: 40,
   },
+  userName: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  userEmail: {
+    color: "#ddd",
+    fontSize: 14,
+    marginTop: 2,
+  },
   drawerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 12,
   },
   drawerItemText: {
     color: "#fff",
@@ -91,17 +96,29 @@ const styles = StyleSheet.create({
   divider: {
     borderBottomColor: "#fff",
     borderBottomWidth: 0.5,
-    marginVertical: 15,
+    marginVertical: 20,
   },
-  logoutContainer: {
-    marginBottom: 30,
-  },
-  logoutButton: {
+  logoContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   cornerstoneIcon: {
-    width: 15,
-    height: 18,
+    width: 20,
+    height: 22,
+    resizeMode: "contain",
+  },
+  cornerstoneText: {
+    color: "#fff",
+    fontSize: 14,
+    marginLeft: 8,
+    fontWeight: "500",
+  },
+  footer: {
+    alignItems: "flex-start",
+    marginBottom: 20,
+  },
+  version: {
+    color: "#ddd",
+    fontSize: 12,
   },
 });

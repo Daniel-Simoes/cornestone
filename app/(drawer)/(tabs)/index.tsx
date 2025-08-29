@@ -8,26 +8,40 @@ const data = [
     id: "1",
     title: "Schematics PDF's Files",
     category: "Drawings and Plans",
-    subCategory: ["General Services", "Lighting & Protective Services", "Distribution Schematics"],
+    subCategory: [
+      { name: "General Services", content: "2d.png" },
+      { name: "Lighting & Protective Services", content: "" },
+      { name: "Distribution Schematics", content: "" },
+    ],
     image: require("../../../assets/2d.png"),
   },
   {
     id: "2",
     title: "Individual Circuit Apresentation",
     category: "3D Simulation",
-    subCategory: ["Lighting", "Sockets", "Heating","Cooker","TV", "Internet"],
+    subCategory: [
+      { name: "Lighting", content: "3D layout of lighting circuits" },
+      { name: "Sockets", content: "3D layout of sockets" },
+      { name: "Heating", content: "Heating overview" },
+      { name: "Cooker", content: "Oven/Cooker electrical details" },
+      { name: "TV", content: "TV points" },
+      { name: "Internet", content: "Network layout" },
+    ],
     image: require("../../../assets/pdf.png"),
   },
   {
     id: "3",
     title: "Financial Overview",
     category: "Certificates and Warrants",
-    subCategory: ["Datasheets", "Viability Certs"],
+    subCategory: [
+      { name: "Datasheets", content: "Manufacturer technical documents" },
+      { name: "Viability Certs", content: "Feasibility documentation" },
+    ],
     image: require("../../../assets/certs.png"),
   },
 ];
 
-export default function RootLayout() {
+export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
@@ -38,7 +52,7 @@ export default function RootLayout() {
       />
       <CarouselSupport
         title={data[activeIndex].category}
-        items={data[activeIndex].subCategory}
+        items={data[activeIndex].subCategory} // passa os objetos diretamente
       />
     </View>
   );
@@ -47,6 +61,5 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
 });

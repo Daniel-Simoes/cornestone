@@ -12,6 +12,9 @@ export default function RootLayout() {
         headerStyle: {
           backgroundColor: '#fff',
         },
+        headerTitleStyle: {
+          color: '#000',
+        },
       }}
     >
       {/* Tabs: sem header */}
@@ -38,21 +41,27 @@ export default function RootLayout() {
           return {
             headerTitle: title,
             headerBackTitle: '',
+            headerStyle: {
+              backgroundColor: '#000', // fundo preto
+            },
+            headerTitleStyle: {
+              color: '#fff', // título branco
+            },
             headerLeft: () => (
-              <TouchableOpacity onPress={() => navigation.goBack()} >
+              <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Ionicons
                   name="arrow-back-outline"
                   size={26}
-                  color="#007bff"
+                  color="#fff" // ícone branco
                 />
               </TouchableOpacity>
             ),
             headerRight: () => (
-              <TouchableOpacity onPress={() => console.log('Info pressed')} >
+              <TouchableOpacity onPress={() => console.log('Info pressed')}>
                 <Ionicons
                   name="information-circle-outline"
                   size={26}
-                  color="#007bff"
+                  color="#fff" // ícone branco
                 />
               </TouchableOpacity>
             ),

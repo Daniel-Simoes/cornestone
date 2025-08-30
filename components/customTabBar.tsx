@@ -8,19 +8,31 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const TABS = [
+// 🔹 Garante que os ícones são válidos do Ionicons
+type IoniconName = React.ComponentProps<typeof Ionicons>["name"];
+
+const TABS: { name: string; icon: IoniconName }[] = [
   { name: "index", icon: "home-outline" },
   { name: "camera", icon: "qr-code" },
   { name: "notifications", icon: "notifications-outline" },
 ];
 
-export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export default function CustomTabBar({
+  state,
+  descriptors,
+  navigation,
+}: BottomTabBarProps) {
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
+
+  const handleScan = () => {
+    console.log("Scanear pressed");
+    // Aqui você pode chamar sua função de escaneamento
+  };
 
   return (
     <>
@@ -28,7 +40,8 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
       <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
-          const icon = TABS.find((tab) => tab.name === route.name)?.icon || "ellipse";
+          const icon =
+            TABS.find((tab) => tab.name === route.name)?.icon || "ellipse";
 
           const onPress = () => {
             if (route.name === "camera") {
@@ -38,8 +51,8 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
             }
           };
 
-          // Esconde o botão de câmera aqui (será desenhado separadamente)
-          if (route.name === "camera") return <View key={route.key} style={{ flex: 1 }} />;
+          if (route.name === "camera")
+            return <View key={route.key} style={{ flex: 1 }} />;
 
           return (
             <TouchableOpacity
@@ -75,13 +88,6 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
         onRequestClose={() => setCameraModalVisible(false)}
       >
         <View style={styles.modalOverlayCamera}>
-          <TouchableOpacity
-            style={styles.closeIconOverlay}
-            onPress={() => setCameraModalVisible(false)}
-          >
-            <Ionicons name="close" size={28} color="#fff" />
-          </TouchableOpacity>
-
           <View style={styles.modalContent}>
             <Image
               source={require("../assets/fuseboard.png")}
@@ -95,12 +101,23 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
             <Text style={{ textAlign: "center" }}>
               Vá até o Quadro geral e escaneie o QR code
             </Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setCameraModalVisible(false)}
-            >
-              <Text style={{ color: "#fff" }}>Fechar</Text>
-            </TouchableOpacity>
+
+            {/* Linha de botões: Fechar e Scanear */}
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.closeBtn]}
+                onPress={() => setCameraModalVisible(false)}
+              >
+                <Text style={styles.actionButtonText}>Fechar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.scanBtn]}
+                onPress={handleScan}
+              >
+                <Text style={styles.actionButtonText}>Scanear</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -125,11 +142,11 @@ const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
     alignItems: "center",
-    top: 8
+    top: 8,
   },
   floatingCameraButton: {
     position: "absolute",
-    bottom: 30, // Ajuste conforme necessário para o visual
+    bottom: 30,
     alignSelf: "center",
     backgroundColor: "#2357C4",
     width: 60,
@@ -145,28 +162,39 @@ const styles = StyleSheet.create({
   },
   modalOverlayCamera: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.9)",
+    backgroundColor: "rgba(0,0,0,0.93)",
     justifyContent: "center",
     alignItems: "center",
   },
-  closeIconOverlay: {
-    position: "absolute",
-    top: "40%",
-    right: 20,
-    zIndex: 1,
-  },
   modalContent: {
-    width: 250,
+    width: 280,
     padding: 20,
     backgroundColor: "#fff",
     borderRadius: 10,
     alignItems: "center",
   },
-  closeButton: {
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginTop: 16,
-    backgroundColor: "#007bff",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 10,
     borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  closeBtn: {
+    backgroundColor: "#007bff",
+  },
+  scanBtn: {
+    backgroundColor: "#28a745",
+  },
+  actionButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

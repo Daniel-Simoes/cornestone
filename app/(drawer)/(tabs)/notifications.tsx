@@ -1,12 +1,6 @@
+import NotificationItem from "@/components/notification";
 import React, { useRef, useState } from "react";
-import {
-  Animated,
-  FlatList,
-  StyleSheet,
-  View
-} from "react-native";
-
-import NotificationItem from "@/components/notification"; // ajuste o caminho conforme necessário
+import { Animated, FlatList, StyleSheet, View } from "react-native";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([
@@ -31,9 +25,7 @@ export default function Notifications() {
     },
   ]);
 
-  // useRef armazenando Map para os anims de opacidade de cada item
   const rowRefs = useRef(new Map());
-
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handlePress = (id: string) => {
@@ -50,7 +42,7 @@ export default function Notifications() {
       }).start(() => {
         setNotifications((prev) => prev.filter((item) => item.id !== id));
         if (expandedId === id) setExpandedId(null);
-        rowRefs.current.delete(id); // limpa referência após apagar
+        rowRefs.current.delete(id);
       });
     }
   };
@@ -80,7 +72,6 @@ export default function Notifications() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "red",
     paddingTop: 10,
   },
   listContainer: {

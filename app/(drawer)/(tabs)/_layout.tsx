@@ -1,25 +1,30 @@
 import Avatar from "@/components/avatar";
 import CustomTabBar from "@/components/customTabBar";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  DrawerNavigationProp,
+  useDrawerProgress,
+  useDrawerStatus,
+} from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import React from "react";
 import { StatusBar, StyleSheet, TouchableOpacity } from "react-native";
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
-// 🚀 Hooks de animação / drawer
-import {
-  useDrawerProgress,
-  useDrawerStatus,
-} from "@react-navigation/drawer";
-import Animated, { interpolate, useAnimatedStyle } from "react-native-reanimated";
+type DrawerNav = DrawerNavigationProp<any>;
 
 export default function TabLayout() {
-  const navigation = useNavigation();
-  const progress = useDrawerProgress() as any; // usado só para animação
-  const drawerStatus = useDrawerStatus(); // "open" | "closed"
+  const navigation = useNavigation<DrawerNav>();
+  const progress = useDrawerProgress() as any;
+  const drawerStatus = useDrawerStatus();
   const isDrawerOpen = drawerStatus === "open";
 
-  // Animação da tela principal (mantive sua lógica)
+  // animação da tela principal
   const animatedStyle = useAnimatedStyle(() => {
     const p = progress?.value ?? 0;
     return {
@@ -33,14 +38,30 @@ export default function TabLayout() {
     };
   });
 
+  // animação do background por trás da tela animada (mais rápida)
+  const backgroundStyle = useAnimatedStyle(() => {
+    const p = progress?.value ?? 0;
+    const fastProgress = Math.min(p / 0.7, 1); // acelera a transição
+
+    return {
+      backgroundColor: interpolateColor(
+        fastProgress,
+        [0, 1],
+        ["#fff", "#2357C4"]
+      ),
+    };
+  });
+
   return (
     <>
-      {/* StatusBar controlada pelo estado do drawer */}
       <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle={isDrawerOpen ? "light-content" : "dark-content"}
       />
+
+      {/* Fundo animado */}
+      <Animated.View style={[StyleSheet.absoluteFill, backgroundStyle]} />
 
       <Animated.View style={[styles.animatedContainer, animatedStyle]}>
         <Tabs

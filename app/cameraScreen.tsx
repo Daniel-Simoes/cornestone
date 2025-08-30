@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   Dimensions,
@@ -13,9 +12,10 @@ import {
 type Props = {
   visible: boolean;
   onClose: () => void;
+  onScan: () => void; // callback para o botão Scanear
 };
 
-export default function ModalCameraScreen({ visible, onClose }: Props) {
+export default function ModalCameraScreen({ visible, onClose, onScan }: Props) {
   return (
     <Modal
       animationType="slide"
@@ -24,23 +24,26 @@ export default function ModalCameraScreen({ visible, onClose }: Props) {
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlayCamera}>
-        {/* Botão de Fechar no canto superior direito */}
-        <TouchableOpacity style={styles.closeIconOverlay} onPress={onClose}>
-          <Ionicons name="close" size={28} color="#fff" />
-        </TouchableOpacity>
-
         {/* Conteúdo principal */}
         <View style={styles.modalContent}>
           <Image
-            source={require("../assets/fuseboard.png")} // ajuste o caminho conforme sua estrutura
+            source={require("../assets/fuseboard.png")} // ajuste o caminho
             style={styles.image}
           />
           <Text style={styles.instructionText}>
             Vá até o Quadro geral e escaneie o QR code
           </Text>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Fechar</Text>
-          </TouchableOpacity>
+
+          {/* Botões inferiores: Fechar à esquerda, Scanear à direita */}
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.actionButton} onPress={onClose}>
+              <Text style={styles.actionButtonText}>Fechar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.actionButton, styles.scanButton]} onPress={onScan}>
+              <Text style={styles.actionButtonText}>Scanear</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -53,12 +56,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.9)",
     justifyContent: "center",
     alignItems: "center",
-  },
-  closeIconOverlay: {
-    position: "absolute",
-    top: "40%",
-    right: 20,
-    zIndex: 1,
   },
   modalContent: {
     width: 250,
@@ -77,16 +74,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 15,
     color: "#333",
+    marginBottom: 20,
   },
-  closeButton: {
-    marginTop: 16,
-    backgroundColor: "#007bff",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 10,
     borderRadius: 8,
+    backgroundColor: "#007bff",
+    alignItems: "center",
+    marginHorizontal: 5,
   },
-  closeButtonText: {
+  scanButton: {
+    backgroundColor: "#28a745", // verde para Scanear
+  },
+  actionButtonText: {
     color: "#fff",
     fontSize: 16,
+    fontWeight: "bold",
   },
 });

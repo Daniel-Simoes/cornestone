@@ -13,24 +13,20 @@ export default function DrawerLayout() {
       screenOptions={{
         headerShown: false,
         drawerStyle: {
-          backgroundColor: "#1565C0", // azul mais próximo do print
+          backgroundColor: "#2357C4",
           width: 275,
         },
         overlayColor: "transparent",
-        // drawerActiveTintColor: "#fff",
-        // drawerInactiveTintColor: "#fff",
       }}
       drawerContent={() => (
         <View style={styles.drawerContainer}>
-          {/* TOPO */}
           <View>
             <View style={styles.profileContainer}>
-              <Avatar size={70} />
+              <Avatar />
               <Text style={styles.userName}>Mark Philips</Text>
               <Text style={styles.userEmail}>mark_philips@gmail.com</Text>
             </View>
 
-            {/* Itens de navegação */}
             <TouchableOpacity style={styles.drawerItem}>
               <Text style={styles.drawerItemText}>Configurações</Text>
             </TouchableOpacity>
@@ -41,7 +37,6 @@ export default function DrawerLayout() {
 
             <View style={styles.divider} />
 
-            {/* Logo */}
             <View style={styles.logoContainer}>
               <Image
                 source={require("../../assets/logo.png")}
@@ -51,7 +46,6 @@ export default function DrawerLayout() {
             </View>
           </View>
 
-          {/* Rodapé */}
           <View style={styles.footer}>
             <Text style={styles.version}>~ v 1.0.1</Text>
           </View>
@@ -69,7 +63,6 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     justifyContent: "space-between",
-    backgroundColor: "#2357C4",
   },
   profileContainer: {
     alignItems: "flex-start",

@@ -1,14 +1,14 @@
 import NotificationItem from "@/components/notification";
-import React, { useRef, useState } from "react";
-import { Animated, FlatList, StyleSheet, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback, useRef, useState } from "react";
+import { Animated, FlatList, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([
     {
       id: "1",
       title: "Novo Arquivo Adicionado",
-      description:
-        "Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat.",
+      description: "Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat. Você recebeu uma nova mensagem no chat.",
       icon: "cloud-upload-outline",
     },
     {
@@ -27,6 +27,18 @@ export default function Notifications() {
 
   const rowRefs = useRef(new Map());
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Fecha qualquer notificação expandida
+  const handleCloseExpanded = () => {
+    setExpandedId(null);
+  };
+
+  // Resetar estado quando a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      handleCloseExpanded();
+    }, [])
+  );
 
   const handlePress = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -48,24 +60,29 @@ export default function Notifications() {
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        renderItem={({ item, index }) => (
-          <NotificationItem
-            item={item}
-            isExpanded={expandedId === item.id}
-            onPress={() => handlePress(item.id)}
-            onDelete={() => handleDelete(item.id)}
-            refMap={rowRefs}
-            index={index}
-            total={notifications.length}
-          />
-        )}
-      />
-    </View>
+    <TouchableWithoutFeedback onPress={handleCloseExpanded}>
+      <View style={styles.container}>
+        <FlatList
+          data={notifications}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+          renderItem={({ item, index }) => (
+            <NotificationItem
+              item={item}
+              isExpanded={expandedId === item.id}
+              onPress={(e) => {
+                e.stopPropagation?.(); // previne o TouchableWithoutFeedback de fechar imediatamente
+                handlePress(item.id);
+              }}
+              onDelete={() => handleDelete(item.id)}
+              refMap={rowRefs}
+              index={index}
+              total={notifications.length}
+            />
+          )}
+        />
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

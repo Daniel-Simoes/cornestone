@@ -1,4 +1,4 @@
-import CustomDrawerContent from "@/components/customDrawer";
+import CustomDrawerContent from "@/components/customNavigation/drawer";
 import { Drawer } from "expo-router/drawer";
 import React from "react";
 

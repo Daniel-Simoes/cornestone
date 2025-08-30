@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import ProfileModal from "./modal";
+import ProfileModal from "./modals/profile";
 
 type AvatarProps = {
   size?: number;

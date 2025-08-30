@@ -1,5 +1,5 @@
-import CustomHeader from "@/components/customHeader";
-import CustomTabBar from "@/components/customTabBar";
+import CustomHeader from "@/components/customNavigation/header";
+import CustomTabBar from "@/components/customNavigation/tabBar";
 import { DrawerNavigationProp, useDrawerProgress, useDrawerStatus } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import { Tabs } from "expo-router";
@@ -70,7 +70,6 @@ export default function TabLayout() {
               headerRight: undefined, 
             }}
           />
-          <Tabs.Screen name="camera" options={{ tabBarIcon: () => null }} />
           <Tabs.Screen name="notifications" options={{ headerTitle: "Notifications", tabBarIcon: () => null }} />
         </Tabs>
       </Animated.View>

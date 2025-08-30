@@ -56,7 +56,7 @@ export default function ProfileModal({ visible, onClose, avatarSize = 100 }: Pro
           {/* Avatar grande e nome */}
           <View style={styles.profileInfo}>
             <Image
-              source={require("../assets/avatar.png")}
+              source={require("../../assets/avatar.png")}
               style={{
                 width: modalAvatarSize,
                 height: modalAvatarSize,

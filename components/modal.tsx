@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   Image,
+  Modal,
   SectionList,
   StyleSheet,
   Text,
@@ -13,16 +14,14 @@ type SectionItem = { label: string; value?: string };
 type SectionData = { title: string; data: SectionItem[] };
 
 type ProfileModalProps = {
+  visible: boolean;
   onClose: () => void;
   avatarSize?: number;
-  userName?: string;
 };
 
-export default function ProfileModal({
-  onClose,
-  avatarSize = 120,
-  userName = "Daniel S.",
-}: ProfileModalProps) {
+export default function ProfileModal({ visible, onClose, avatarSize = 100 }: ProfileModalProps) {
+  const modalAvatarSize = avatarSize;
+
   const sections: SectionData[] = [
     { title: "", data: [{ label: "Activity Status", value: "Active" }] },
     {
@@ -44,54 +43,57 @@ export default function ProfileModal({
   ];
 
   return (
-    <View style={styles.modalOverlay}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeader}>
-          <TouchableOpacity onPress={onClose}>
-            <Text style={styles.closeText}>Close</Text>
-          </TouchableOpacity>
-        </View>
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.closeText}>Close</Text>
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.profileInfo}>
-          <Image
-            source={require("../../assets/avatar.png")}
-            style={{
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: avatarSize / 2,
-              marginBottom: 10,
+          {/* Avatar grande e nome */}
+          <View style={styles.profileInfo}>
+            <Image
+              source={require("../assets/avatar.png")}
+              style={{
+                width: modalAvatarSize,
+                height: modalAvatarSize,
+                borderRadius: modalAvatarSize / 2,
+                marginBottom: 10,
+              }}
+            />
+            <Text style={styles.profileName}>Daniel S.</Text>
+          </View>
+
+          {/* SectionList */}
+          <SectionList
+            sections={sections}
+            keyExtractor={(item, index) => item.label + index}
+            renderItem={({ item, index, section }) => {
+              const isLast = index === section.data.length - 1;
+              return (
+                <View style={styles.card}>
+                  <TouchableOpacity
+                    style={[styles.listItem, isLast && styles.listItemLast]}
+                  >
+                    <Text style={styles.listItemLabel}>{item.label}</Text>
+                    {item.value && <Text style={styles.listItemValue}>{item.value}</Text>}
+                    <Ionicons name="chevron-forward" size={18} color="#ccc" />
+                  </TouchableOpacity>
+                </View>
+              );
             }}
+            renderSectionHeader={({ section: { title } }) =>
+              title ? <Text style={styles.sectionHeader}>{title}</Text> : null
+            }
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            contentContainerStyle={{ paddingBottom: 40 }}
           />
-          <Text style={styles.profileName}>{userName}</Text>
         </View>
-
-        <SectionList
-          sections={sections}
-          keyExtractor={(item, index) => item.label + index}
-          renderItem={({ item, index, section }) => {
-            const isLast = index === section.data.length - 1;
-            return (
-              <View style={styles.card}>
-                <TouchableOpacity
-                  style={[styles.listItem, isLast && styles.listItemLast]}
-                >
-                  <Text style={styles.listItemLabel}>{item.label}</Text>
-                  {item.value && (
-                    <Text style={styles.listItemValue}>{item.value}</Text>
-                  )}
-                  <Ionicons name="chevron-forward" size={18} color="#ccc" />
-                </TouchableOpacity>
-              </View>
-            );
-          }}
-          renderSectionHeader={({ section: { title } }) =>
-            title ? <Text style={styles.sectionHeader}>{title}</Text> : null
-          }
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        />
       </View>
-    </View>
+    </Modal>
   );
 }
 

@@ -1,13 +1,8 @@
-import Avatar from "@/components/avatar";
+import CustomDrawerContent from "@/components/customDrawer";
 import { Drawer } from "expo-router/drawer";
 import React from "react";
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function DrawerLayout() {
-  const handleLogout = () => {
-    Alert.alert("Logout", "Você saiu da conta!");
-  };
-
   return (
     <Drawer
       screenOptions={{
@@ -18,100 +13,9 @@ export default function DrawerLayout() {
         },
         overlayColor: "transparent",
       }}
-      drawerContent={() => (
-        <View style={styles.drawerContainer}>
-          <View>
-            <View style={styles.profileContainer}>
-              <Avatar />
-              <Text style={styles.userName}>Mark Philips</Text>
-              <Text style={styles.userEmail}>mark_philips@gmail.com</Text>
-            </View>
-
-            <TouchableOpacity style={styles.drawerItem}>
-              <Text style={styles.drawerItemText}>Configurações</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.drawerItem}>
-              <Text style={styles.drawerItemText}>Suporte</Text>
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <View style={styles.logoContainer}>
-              <Image
-                source={require("../../assets/logo.png")}
-                style={styles.cornerstoneIcon}
-              />
-              <Text style={styles.cornerstoneText}>cornerstone</Text>
-            </View>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.version}>~ v 1.0.1</Text>
-          </View>
-        </View>
-      )}
+      drawerContent={() => <CustomDrawerContent />}
     >
       <Drawer.Screen name="(tabs)" />
     </Drawer>
   );
 }
-
-const styles = StyleSheet.create({
-  drawerContainer: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    justifyContent: "space-between",
-  },
-  profileContainer: {
-    alignItems: "flex-start",
-    marginBottom: 40,
-  },
-  userName: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  userEmail: {
-    color: "#ddd",
-    fontSize: 14,
-    marginTop: 2,
-  },
-  drawerItem: {
-    marginVertical: 12,
-  },
-  drawerItemText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  divider: {
-    borderBottomColor: "#fff",
-    borderBottomWidth: 0.5,
-    marginVertical: 20,
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  cornerstoneIcon: {
-    width: 20,
-    height: 22,
-    resizeMode: "contain",
-  },
-  cornerstoneText: {
-    color: "#fff",
-    fontSize: 14,
-    marginLeft: 8,
-    fontWeight: "500",
-  },
-  footer: {
-    alignItems: "flex-start",
-    marginBottom: 20,
-  },
-  version: {
-    color: "#ddd",
-    fontSize: 12,
-  },
-});

@@ -3,9 +3,10 @@ import CustomTabBar from "@/components/customNavigation/tabBar";
 import { DrawerNavigationProp, useDrawerProgress, useDrawerStatus } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import { Tabs } from "expo-router";
-import React from "react";
-import { StatusBar, StyleSheet } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet } from "react-native";
 import Animated, { interpolate, interpolateColor, useAnimatedStyle } from "react-native-reanimated";
+import { useUI } from "../../uiContext";
 
 type DrawerNav = DrawerNavigationProp<any>;
 
@@ -14,6 +15,16 @@ export default function TabLayout() {
   const progress = useDrawerProgress() as any;
   const drawerStatus = useDrawerStatus();
   const isDrawerOpen = drawerStatus === "open";
+
+  const { setStatusBar } = useUI();
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      setStatusBar("light-content", "transparent");
+    } else {
+      setStatusBar("dark-content", "transparent");
+    }
+  }, [isDrawerOpen]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const p = progress?.value ?? 0;
@@ -36,14 +47,13 @@ export default function TabLayout() {
     };
   });
 
-  // 🔴 Aqui criamos a camada vermelha
   const redShadowStyle = useAnimatedStyle(() => {
     const p = progress?.value ?? 0;
     return {
-      opacity: interpolate(p, [0, 1], [0, 1]), // aparece quando drawer abre
+      opacity: interpolate(p, [0, 1], [0, 1]),
       transform: [
-        { scale: interpolate(p, [0, 1], [1, 0.65]) }, // menor que a home
-        { translateX: interpolate(p, [0, 1], [0, -105]) }, // leve deslocamento
+        { scale: interpolate(p, [0, 1], [1, 0.65]) },
+        { translateX: interpolate(p, [0, 1], [0, -105]) },
       ],
       borderRadius: interpolate(p, [0, 1], [0, 25]),
       backgroundColor: "rgba(255,255,255,0.15)",
@@ -57,19 +67,8 @@ export default function TabLayout() {
 
   return (
     <>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle={isDrawerOpen ? "light-content" : "dark-content"}
-      />
-
-      {/* Fundo azul */}
       <Animated.View style={[StyleSheet.absoluteFill, backgroundStyle]} />
-
-      {/* 🔴 Camada vermelha atrás do container branco */}
       <Animated.View style={redShadowStyle} />
-
-      {/* Conteúdo principal */}
       <Animated.View style={[styles.animatedContainer, animatedStyle]}>
         <Tabs
           tabBar={(props) => <CustomTabBar {...props} />}
@@ -94,7 +93,10 @@ export default function TabLayout() {
               headerRight: undefined,
             }}
           />
-          <Tabs.Screen name="notifications" options={{ headerTitle: "Notifications", tabBarIcon: () => null }} />
+          <Tabs.Screen
+            name="notifications"
+            options={{ headerTitle: "Notifications", tabBarIcon: () => null }}
+          />
         </Tabs>
       </Animated.View>
     </>

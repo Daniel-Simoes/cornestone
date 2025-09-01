@@ -3,7 +3,6 @@ import React from "react";
 import {
   Image,
   Modal,
-  SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -67,30 +66,35 @@ export default function ProfileModal({ visible, onClose, avatarSize = 100 }: Pro
             <Text style={styles.profileName}>Daniel S.</Text>
           </View>
 
-          {/* SectionList */}
-          <SectionList
-            sections={sections}
-            keyExtractor={(item, index) => item.label + index}
-            renderItem={({ item, index, section }) => {
-              const isLast = index === section.data.length - 1;
-              return (
+          {/* Lista estática de seções */}
+          <View style={{ paddingBottom: 40 }}>
+            {sections.map((section, sectionIndex) => (
+              <View key={sectionIndex} style={{ marginBottom: 20 }}>
+                {section.title ? (
+                  <Text style={styles.sectionHeader}>{section.title}</Text>
+                ) : null}
+
                 <View style={styles.card}>
-                  <TouchableOpacity
-                    style={[styles.listItem, isLast && styles.listItemLast]}
-                  >
-                    <Text style={styles.listItemLabel}>{item.label}</Text>
-                    {item.value && <Text style={styles.listItemValue}>{item.value}</Text>}
-                    <Ionicons name="chevron-forward" size={18} color="#ccc" />
-                  </TouchableOpacity>
+                  {section.data.map((item, index) => {
+                    const isLast = index === section.data.length - 1;
+                    return (
+                      <TouchableOpacity
+                        key={item.label}
+                        style={[styles.listItem, isLast && styles.lastItem]}
+                        activeOpacity={0.6}
+                      >
+                        <Text style={styles.listItemLabel}>{item.label}</Text>
+                        {item.value && (
+                          <Text style={styles.listItemValue}>{item.value}</Text>
+                        )}
+                        <Ionicons name="chevron-forward" size={20} color="#555" />
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              );
-            }}
-            renderSectionHeader={({ section: { title } }) =>
-              title ? <Text style={styles.sectionHeader}>{title}</Text> : null
-            }
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-            contentContainerStyle={{ paddingBottom: 40 }}
-          />
+              </View>
+            ))}
+          </View>
         </View>
       </View>
     </Modal>
@@ -128,19 +132,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "700",
   },
+  sectionHeader: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666",
+    marginBottom: 8,
+    marginLeft: 4,
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ddd",
     overflow: "hidden",
-  },
-  sectionHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#666",
   },
   listItem: {
     flexDirection: "row",
@@ -149,23 +153,21 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
-  listItemLast: {
+  lastItem: {
     borderBottomWidth: 0,
   },
   listItemLabel: {
     fontSize: 16,
     color: "#111",
+    flex: 1,
   },
   listItemValue: {
     fontSize: 14,
     color: "green",
     marginRight: 8,
     fontWeight: "600",
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "#eee",
-    marginLeft: 16,
   },
 });

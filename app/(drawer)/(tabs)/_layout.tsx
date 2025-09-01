@@ -36,6 +36,25 @@ export default function TabLayout() {
     };
   });
 
+  // 🔴 Aqui criamos a camada vermelha
+  const redShadowStyle = useAnimatedStyle(() => {
+    const p = progress?.value ?? 0;
+    return {
+      opacity: interpolate(p, [0, 1], [0, 1]), // aparece quando drawer abre
+      transform: [
+        { scale: interpolate(p, [0, 1], [1, 0.65]) }, // menor que a home
+        { translateX: interpolate(p, [0, 1], [0, -105]) }, // leve deslocamento
+      ],
+      borderRadius: interpolate(p, [0, 1], [0, 25]),
+      backgroundColor: "rgba(255,255,255,0.15)",
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    };
+  });
+
   return (
     <>
       <StatusBar
@@ -44,8 +63,13 @@ export default function TabLayout() {
         barStyle={isDrawerOpen ? "light-content" : "dark-content"}
       />
 
+      {/* Fundo azul */}
       <Animated.View style={[StyleSheet.absoluteFill, backgroundStyle]} />
 
+      {/* 🔴 Camada vermelha atrás do container branco */}
+      <Animated.View style={redShadowStyle} />
+
+      {/* Conteúdo principal */}
       <Animated.View style={[styles.animatedContainer, animatedStyle]}>
         <Tabs
           tabBar={(props) => <CustomTabBar {...props} />}
@@ -66,8 +90,8 @@ export default function TabLayout() {
                 />
               ),
               tabBarIcon: () => null,
-              headerLeft: undefined, 
-              headerRight: undefined, 
+              headerLeft: undefined,
+              headerRight: undefined,
             }}
           />
           <Tabs.Screen name="notifications" options={{ headerTitle: "Notifications", tabBarIcon: () => null }} />

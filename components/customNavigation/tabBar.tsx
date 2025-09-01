@@ -11,17 +11,29 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 
   const handleScan = () => console.log("Scan pressed");
 
+  const currentRoute = state.routes[state.index].name;
+
   return (
     <>
       <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
+        {/* Home */}
         <TouchableOpacity onPress={() => navigation.navigate("index")} style={styles.tabButton}>
-          <Ionicons name="home-outline" size={24} color={state.index === 0 ? "#2357C4" : "#999"} />
+          <Ionicons 
+            name="home-outline" 
+            size={24} 
+            color={currentRoute === "index" ? "#2357C4" : "#999"} 
+          />
         </TouchableOpacity>
 
         <View style={{ flex: 1 }} />
 
+        {/* Notifications */}
         <TouchableOpacity onPress={() => navigation.navigate("notifications")} style={styles.tabButton}>
-          <Ionicons name="notifications-outline" size={24} color={state.index === 2 ? "#2357C4" : "#999"} />
+          <Ionicons 
+            name="notifications-outline" 
+            size={24} 
+            color={currentRoute === "notifications" ? "#2357C4" : "#999"} 
+          />
         </TouchableOpacity>
       </View>
 
@@ -31,17 +43,18 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         style={styles.floatingCameraButton}
         activeOpacity={0.9}
       >
-        <Ionicons name="qr-code" size={28} color="#fff" />
+        <Ionicons name="camera-outline" size={30} color="#fff" />
       </TouchableOpacity>
+
       <CameraPreview 
         visible={cameraVisible} 
-        onClose={() => setCameraVisible(false)} onScan={handleScan} 
+        onClose={() => setCameraVisible(false)} 
+        onScan={handleScan} 
       />
     </>
   );
 }
 
-// estilos iguais aos seus
 const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
